@@ -35,7 +35,7 @@ Valid /toc/ requires 2 columns: file name, file size.
 
 /File name/ must by a name of concrete file. Directory paths must be excluded.
 
-/File size/ must be a 64 bit unsigned integer.
+/File size/ must be a 64 bit unsigned integer. It represents file size in bytes.
 
 Last row of toc describes /content/ section at all. /File name/ in this row always equals =content=. /File size/ in this row equal sum of /file sizes/ in other rows.
 
