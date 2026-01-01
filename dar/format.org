@@ -1,0 +1,66 @@
+#+title: Dacha Archiver format description
+#+author: Centrix14
+#+date: <2026-01-01 Чт>
+
+* Goal
+Dacha Archiver (=dar=) is a small toy archiver made as etude in Zig programming and archive technology. Its format (=daf=) has the same nature.
+
+* General structure
+Daf-file has divided into sections. File must have 3 (and only 3) sections: /header/, /toc/ and /content/. Sections have arbitrary size. Sections separated by =section_seperator=.
+
+General structure of archive is follows:
+| Header  |
+|---------|
+| Toc     |
+|---------|
+| Content |
+|---------|
+| EOF     |
+
+
+** Sections in general
+/Header/ section contains information about file. It consists of 3 bytes: =0x44=, =0x41=, =0x46= (=DAF= letters).
+
+/Toc/ (table of contents) section contains information about files comprising an archive. /Toc/ is a literally table of this structure:
+| File name    | File size |
+|--------------+-----------|
+| example-file |      0x34 |
+
+/Toc/ may have additional columns. Columns in a row separated by =column_separator=.
+
+/Content/ is the main section. It contains bytes of archived files one by one, without separation. Files can be separated only with the help of /toc/.
+
+** Table of contents
+Valid /toc/ requires 2 columns: file name, file size.
+
+/File name/ must by a name of concrete file. Directory paths must be excluded.
+
+/File size/ must be a 64 bit unsigned integer.
+
+Last row of toc describes /content/ section at all. /File name/ in this row always equals =content=. /File size/ in this row equal sum of /file sizes/ in other rows.
+
+* Special characters
+Special characters divided in separators and hats. Separators used to divide sections, columns and other data. Hats used for hiding special characters (even other hats).
+
+Special characters defined as sequence of 2 bytes (/b1/ and /b2/).
+
+** Separators
+| Separator |   b1 |   b2 |
+|-----------+------+------|
+| section   | 0x00 | 0x00 |
+| column    | 0x00 | 0xff |
+
+* Validation rules
+Validation driven by set of rules listed below. Valid file must fit all rules.
+
+** R01. File starts with Daf header
+Valid Daf-file starts with =0x44=, =0x41=, =0x46= bytes.
+
+** R02. File has 3 sections
+Valid Daf-file has only 3 =section_separators=.
+
+** R03. File has =content= row in /toc/
+Valid Daf-file has /toc/ section which last row is a content row. /File name/ of this row equals =content=.
+
+** R04. Content row has valid size
+/File size/ column in content row of the valid daf-file is a sum of file sizes in other rows or 0.
