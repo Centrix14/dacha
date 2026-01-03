@@ -72,6 +72,11 @@ pub const Table = struct {
             else => {}
         }
 
+        for (0..output.len) |j| {
+            if (j != self._pad)
+                output[j] = self.chr(output[j]);
+        }
+
         return output;
     }
 
