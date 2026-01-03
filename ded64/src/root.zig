@@ -35,7 +35,7 @@ pub const Table = struct {
             48...57 => char + 4, // char is a digit
             65...90 => char - 65, // char is a capital letter
             97...122 => char - 71, // char is a small letter
-            else => 0
+            else => unreachable
         };
     }
 
@@ -75,7 +75,7 @@ pub const Table = struct {
                 output[o+3] = 64;
             },
 
-            else => {}
+            else => unreachable
         }
 
         for (0..output.len) |j|
@@ -128,7 +128,7 @@ pub const Table = struct {
                 output[o+1] = (source[1] << 4);
             },
 
-            else => {}
+            else => unreachable
         }
 
         return output;
