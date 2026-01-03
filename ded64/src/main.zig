@@ -10,11 +10,16 @@ pub fn main() !void {
     const allocator = gpa.allocator();
     
     const table = ded64.DefaultTable;
+
+    const message = "Man is distinguished, not only by his reason, but by this singular passion from other animals, which is a lust of the mind, that by a perseverance of delight in the continued and indefatigable generation of knowledge, exceeds the short vehemence of any carnal pleasure.";
     
-    const message = "Man is distinguished\n";
     const encode = try table.encode(allocator, message);
     defer allocator.free(encode);
 
-    try stdout.print("{s}\n", .{encode});
+    const decode = try table.decode(allocator, encode);
+    defer allocator.free(decode);
+
+    try stdout.print("{any}\n", .{std.mem.eql(u8, message, decode)});
+
     try stdout.flush();
 }
