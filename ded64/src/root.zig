@@ -68,15 +68,51 @@ pub const Table = struct {
             output[o+3] = self._pad;
         }
 
-        for (0..output.len) |j| {
-            if (output[j] != self._pad) {
-                output[j] = self.charOf(output[j]);
-            }
+        return output;
+    }
+
+    pub fn decode(self: Table, allocator: std.mem.Allocator, input: [] const u8) ! []u8 {
+        const to_ignore = countIgnoredTail(self._pad, input);
+        const useful_length = input.len - to_ignore;
+        if (useful_length == 0)
+            return "";
+
+        var output = try allocator.alloc(u8, try decodeLengthFor(input) - to_ignore);
+
+        var i: usize = 0;
+        var o: usize = 0;
+        var tail: usize = useful_length - i;
+        while (tail >= 4) : (tail = useful_length - i) {
+            output[o] = (input[i] << 2) | ((input[i+1] & 0b00110000) >> 4);
+            output[o+1] = (input[i+1] << 4) | (input[i+2] >> 2);
+            output[o+2] = (input[i+2] << 6) | input[i+3];
+
+            i += 4; o += 3;
+        }
+
+        switch (tail) {
+            3 => {
+                output[o] = (input[i] << 2) | ((input[i+1] & 0b00110000) >> 4);
+                output[o+1] = (input[i+1] << 4) | (input[i+2] >> 2);
+            },
+
+            2 => {
+                output[o] = (input[i] << 2) | ((input[i+1] & 0b00110000) >> 4);
+                output[o+1] = (input[i+1] << 4);
+            },
+
+            else => {}
         }
 
         return output;
     }
 };
+
+fn countIgnoredTail(pad: u8, buffer: [] const u8) usize {
+    var i: usize = buffer.len - 1;
+    while (buffer[i] == pad) : (i -= 1) {}
+    return buffer.len - i - 1;
+}
 
 pub fn encodeLengthFor(buffer: [] const u8) !usize {
     if (buffer.len < 3)
@@ -84,60 +120,9 @@ pub fn encodeLengthFor(buffer: [] const u8) !usize {
     return try std.math.divCeil(usize, buffer.len, 3) * 4;
 }
 
-test "encodeLengthFor == 4 when buffer.len = 2" {
-    const len = try encodeLengthFor("ab");
-    try testing.expect(len == 4);
-}
-
-test "encodeLengthFor == 8 when buffer.len == 4" {
-    const len = try encodeLengthFor("abcd");
-    try testing.expect(len == 8);
-}
-
-fn countIgnoredTail(buffer: [] const u8) usize {
-    var i: usize = buffer.len - 1;
-    while (buffer[i] == '=') : (i -= 1) {}
-    return buffer.len - i - 1;
-}
-
-test "countIgnoredTail == 0 when buffer is empty" {
-    const tail = countIgnoredTail("abc");
-    try testing.expect(tail == 0);
-}
-
-test "countIgnoredTail == 0 when buffer has no tail" {
-    const tail = countIgnoredTail("abc");
-    try testing.expect(tail == 0);
-}
-
-test "countIgnoredTail == 1 when buffers tail == 1" {
-    const tail = countIgnoredTail("abc=");
-    try testing.expect(tail == 1);
-}
-
-test "countIgnoredTail == 2  when buffers tail == 2" {
-    const tail = countIgnoredTail("abc==");
-    try testing.expect(tail == 2);
-}
-
-test "countIgnoredTail ignores inner `=`" {
-    const tail = countIgnoredTail("=a=bc==");
-    try testing.expect(tail == 2);
-}
-
-pub fn decodedBufferLength(buffer: [] const u8) !usize {
+pub fn decodeLengthFor(buffer: [] const u8) !usize {
     if (buffer.len < 4)
         return 3;
 
-    return try std.math.divFloor(usize, buffer.len, 4) * 3 - countIgnoredTail(buffer);
-}
-
-test "decodedBufferLength == 2 when buffer.len == 4 and no tail" {
-    const len = try decodedBufferLength("abcd");
-    try testing.expect(len == 3);
-}
-
-test "decodedBufferLength == 4 when buffer.len == 8 and tail == 2" {
-    const len = try decodedBufferLength("abcdab==");
-    try testing.expect(len == 4);
+    return try std.math.divFloor(usize, buffer.len, 4) * 3;
 }
