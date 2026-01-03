@@ -9,10 +9,10 @@ pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     const allocator = gpa.allocator();
     
-    const base64 = ded64.Base64.init();
+    const base64 = ded64.Table.init();
     
     const message = "Man is distinguished\n";
-    const encode = try ded64.Base64.encode(base64, allocator, message);
+    const encode = try base64.encode(allocator, message);
     defer allocator.free(encode);
 
     try stdout.print("{s}\n", .{encode});
