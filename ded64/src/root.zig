@@ -38,6 +38,17 @@ pub const Table = struct {
         return table[index];
     }
 
+    pub fn indexOf(self: Table, char: u8) u8 {
+        return switch (char) {
+            48...57 => char + 4, // char is a digit
+            65...90 => char - 65, // char is a capital letter
+            97...122 => char - 71, // char is a small letter
+            self.symbols[0] => 62,
+            self.symbols[1] => 63,
+            self.pad => self.pad // pad has no its special index
+        };
+    }
+
     pub fn encode(self: Table, allocator: std.mem.Allocator, input: [] const u8) ! []u8 {
         if (input.len == 0)
             return "";
