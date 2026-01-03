@@ -1,25 +1,25 @@
 const std = @import("std");
 const testing = std.testing;
 
-pub const Base64 = struct {
+pub const Table = struct {
     _table: *const [64]u8,
 
-    pub fn init() Base64 {
+    pub fn init() Table {
         const upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         const lower = "abcdefghijklmnopqrstuvwxyz";
         const digits = "0123456789";
         const symbols = "+/";
 
-        return Base64 {
+        return Table {
             ._table = upper ++ lower ++ digits ++ symbols,
         };
     }
 
-    pub fn charOf(self: Base64, index: u8) u8 {
+    pub fn charOf(self: Table, index: u8) u8 {
         return self._table[index];
     }
 
-    pub fn encode(self: Base64, allocator: std.mem.Allocator, input: [] const u8) ! []u8 {
+    pub fn encode(self: Table, allocator: std.mem.Allocator, input: [] const u8) ! []u8 {
         if (input.len == 0)
             return "";
         
