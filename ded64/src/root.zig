@@ -1,5 +1,4 @@
 const std = @import("std");
-const testing = std.testing;
 
 pub const DefaultTable = Table.init("+/", '=');
 
@@ -53,26 +52,31 @@ pub const Table = struct {
 
             i += 3; o += 4;
         }
-        
-        if (tail == 2) {
-            output[o] = input[i] >> 2;
-            output[o+1] = ((input[i] & 0b00000011) << 4)
-                | ((input[i+1] & 0b11110000) >> 4);
-            output[o+2] = ((input[i+1] & 0b00001111) << 2);
-            output[o+3] = self._pad;
-        }
-        else if (tail == 1) {
-            output[o] = input[i] >> 2;
-            output[o+1] = ((input[i] & 0b00000011) << 4);
-            output[o+2] = self._pad;
-            output[o+3] = self._pad;
+
+        switch (tail) {
+            2 => {
+                output[o] = input[i] >> 2;
+                output[o+1] = ((input[i] & 0b00000011) << 4)
+                    | ((input[i+1] & 0b11110000) >> 4);
+                output[o+2] = ((input[i+1] & 0b00001111) << 2);
+                output[o+3] = self._pad;
+            },
+            
+            1 => {
+                output[o] = input[i] >> 2;
+                output[o+1] = ((input[i] & 0b00000011) << 4);
+                output[o+2] = self._pad;
+                output[o+3] = self._pad;
+            },
+
+            else => {}
         }
 
         return output;
     }
 
     pub fn decode(self: Table, allocator: std.mem.Allocator, input: [] const u8) ! []u8 {
-        const to_ignore = countIgnoredTail(self._pad, input);
+        const to_ignore = countCharFromEnd(input, self._pad);
         const useful_length = input.len - to_ignore;
         if (useful_length == 0)
             return "";
@@ -108,9 +112,9 @@ pub const Table = struct {
     }
 };
 
-fn countIgnoredTail(pad: u8, buffer: [] const u8) usize {
+fn countCharFromEnd(buffer: [] const u8, char: u8) usize {
     var i: usize = buffer.len - 1;
-    while (buffer[i] == pad) : (i -= 1) {}
+    while (buffer[i] == char) : (i -= 1) {}
     return buffer.len - i - 1;
 }
 
