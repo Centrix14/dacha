@@ -2,21 +2,40 @@ const std = @import("std");
 const testing = std.testing;
 
 pub const Table = struct {
+    _uppers: *const [26]u8,
+    _lowers: *const [26]u8,
+    _digits: *const [10]u8,
+    _symbols: *const [2]u8,
+    _pad: u8,
     _table: *const [64]u8,
 
-    pub fn init() Table {
-        const upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        const lower = "abcdefghijklmnopqrstuvwxyz";
-        const digits = "0123456789";
-        const symbols = "+/";
-
+    fn init(uppers: *const [26]u8,
+            lowers: *const [26]u8,
+            digits: *const [10]u8,
+            symbols: *const [2]u8,
+            pad: u8) Table {
+        
         return Table {
-            ._table = upper ++ lower ++ digits ++ symbols,
+            ._uppers = uppers,
+            ._lowers = lowers,
+            ._digits = digits,
+            ._symbols = symbols,
+            ._pad = pad,
+            ._table = uppers ++ lowers ++ digits ++ symbols
         };
+    }
+    
+    pub fn initDefault() Table {
+        return Table.init("ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+                          "abcdefghijklmnopqrstuvwxyz",
+                          "0123456789",
+                          "+/", '=');
     }
 
     pub fn charOf(self: Table, index: u8) u8 {
-        return self._table[index];
+        const table = self._uppers ++ self._lowers ++ self._digits
+            ++ self._symbols;
+        return table[index];
     }
 
     pub fn encode(self: Table, allocator: std.mem.Allocator, input: [] const u8) ! []u8 {
@@ -44,17 +63,17 @@ pub const Table = struct {
             output[o+1] = ((input[i] & 0b00000011) << 4)
                 | ((input[i+1] & 0b11110000) >> 4);
             output[o+2] = ((input[i+1] & 0b00001111) << 2);
-            output[o+3] = '=';
+            output[o+3] = self._pad;
         }
         else if (tail == 1) {
             output[o] = input[i] >> 2;
             output[o+1] = ((input[i] & 0b00000011) << 4);
-            output[o+2] = '=';
-            output[o+3] = '=';
+            output[o+2] = self._pad;
+            output[o+3] = self._pad;
         }
 
         for (0..output.len) |j| {
-            if (output[j] != '=') {
+            if (output[j] != self._pad) {
                 output[j] = self.charOf(output[j]);
             }
         }
