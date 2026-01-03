@@ -28,7 +28,7 @@ pub const Table = struct {
         var i: usize = 0;
         var o: usize = 0;
         var tail: usize = input.len - i;
-        while (tail >= 3) {
+        while (tail >= 3) : (tail = input.len - i) {
             output[o] = input[i] >> 2;
             output[o+1] = ((input[i] & 0b00000011) << 4)
                 | ((input[i+1] & 0b11110000) >> 4);
@@ -37,7 +37,6 @@ pub const Table = struct {
             output[o+3] = input[i+2] & 0b00111111;
 
             i += 3; o += 4;
-            tail = input.len - i;
         }
         
         if (tail == 2) {
