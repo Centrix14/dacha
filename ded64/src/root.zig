@@ -44,11 +44,11 @@ pub const Table = struct {
         var tail: usize = input.len - i;
         while (tail >= 3) : (tail = input.len - i) {
             output[o] = input[i] >> 2;
-            output[o+1] = ((input[i] & 0b00000011) << 4)
-                | ((input[i+1] & 0b11110000) >> 4);
-            output[o+2] = ((input[i+1] & 0b00001111) << 2)
-                | ((input[i+2] & 0b11000000) >> 6);
-            output[o+3] = input[i+2] & 0b00111111;
+            output[o+1] = ((input[i] & 0x03) << 4)
+                | ((input[i+1] & 0xf0) >> 4);
+            output[o+2] = ((input[i+1] & 0x0f) << 2)
+                | ((input[i+2] & 0xc0) >> 6);
+            output[o+3] = input[i+2] & 0x3f;
 
             i += 3; o += 4;
         }
@@ -56,15 +56,15 @@ pub const Table = struct {
         switch (tail) {
             2 => {
                 output[o] = input[i] >> 2;
-                output[o+1] = ((input[i] & 0b00000011) << 4)
-                    | ((input[i+1] & 0b11110000) >> 4);
-                output[o+2] = ((input[i+1] & 0b00001111) << 2);
+                output[o+1] = ((input[i] & 0x03) << 4)
+                    | ((input[i+1] & 0xf0) >> 4);
+                output[o+2] = ((input[i+1] & 0x0f) << 2);
                 output[o+3] = self._pad;
             },
             
             1 => {
                 output[o] = input[i] >> 2;
-                output[o+1] = ((input[i] & 0b00000011) << 4);
+                output[o+1] = ((input[i] & 0x03) << 4);
                 output[o+2] = self._pad;
                 output[o+3] = self._pad;
             },
@@ -92,7 +92,7 @@ pub const Table = struct {
         var o: usize = 0;
         var tail: usize = useful_length - i;
         while (tail >= 4) : (tail = useful_length - i) {
-            output[o] = (input[i] << 2) | ((input[i+1] & 0b00110000) >> 4);
+            output[o] = (input[i] << 2) | ((input[i+1] & 0x30) >> 4);
             output[o+1] = (input[i+1] << 4) | (input[i+2] >> 2);
             output[o+2] = (input[i+2] << 6) | input[i+3];
 
@@ -101,12 +101,12 @@ pub const Table = struct {
 
         switch (tail) {
             3 => {
-                output[o] = (input[i] << 2) | ((input[i+1] & 0b00110000) >> 4);
+                output[o] = (input[i] << 2) | ((input[i+1] & 0x30) >> 4);
                 output[o+1] = (input[i+1] << 4) | (input[i+2] >> 2);
             },
 
             2 => {
-                output[o] = (input[i] << 2) | ((input[i+1] & 0b00110000) >> 4);
+                output[o] = (input[i] << 2) | ((input[i+1] & 0x30) >> 4);
                 output[o+1] = (input[i+1] << 4);
             },
 
