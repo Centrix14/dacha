@@ -1,41 +1,26 @@
 const std = @import("std");
 const testing = std.testing;
 
+pub const DefaultTable = Table.init("+/", '=');
+
 pub const Table = struct {
-    _uppers: *const [26]u8,
-    _lowers: *const [26]u8,
-    _digits: *const [10]u8,
+    _table: *const [64]u8,
     _symbols: *const [2]u8,
     _pad: u8,
-    _table: *const [64]u8,
 
-    fn init(uppers: *const [26]u8,
-            lowers: *const [26]u8,
-            digits: *const [10]u8,
-            symbols: *const [2]u8,
-            pad: u8) Table {
-        
+    pub fn init(symbols: *const [2]u8, pad: u8) Table {
         return Table {
-            ._uppers = uppers,
-            ._lowers = lowers,
-            ._digits = digits,
+            ._table = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" ++
+                "abcdefghijklmnopqrstuvwxyz" ++
+                "0123456789" ++
+                symbols,
             ._symbols = symbols,
             ._pad = pad,
-            ._table = uppers ++ lowers ++ digits ++ symbols
         };
     }
     
-    pub fn initDefault() Table {
-        return Table.init("ABCDEFGHIJKLMNOPQRSTUVWXYZ",
-                          "abcdefghijklmnopqrstuvwxyz",
-                          "0123456789",
-                          "+/", '=');
-    }
-
     pub fn charOf(self: Table, index: u8) u8 {
-        const table = self._uppers ++ self._lowers ++ self._digits
-            ++ self._symbols;
-        return table[index];
+        return self._table[index];
     }
 
     pub fn indexOf(self: Table, char: u8) u8 {
