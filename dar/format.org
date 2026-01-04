@@ -26,7 +26,7 @@ General structure of archive is follows:
 |--------------+-----------|
 | example-file |      0x34 |
 
-/Toc/ may have additional columns. Columns in a row separated by =column_separator=.
+Columns in a row of /toc/ separated by =column_separator=.
 
 /Content/ is the main section. It contains bytes of archived files one by one, without separation. Files can be separated only with the help of /toc/.
 
@@ -39,8 +39,13 @@ Valid /toc/ requires 2 columns: file name, file size.
 
 Last row of toc describes /content/ section at all. /File name/ in this row always equals =content=. /File size/ in this row equal sum of /file sizes/ in other rows.
 
+* Archive nesting
+/Toc/ enumerates only concrete files. Directories are stored as an archived archives (by recursion principle).
+
+Nested archives stored as all other files. Nested archive can be recognized by header which must start at the corresponding position according to /toc/.
+
 * Special characters
-Special characters divided in separators and hats. Separators used to divide sections, columns and other data. Hats used for hiding special characters (even other hats).
+Special characters are used by dar for its internal purposes. There is only one type of this characters now: separators. Separators used to divide sections, columns and other data.
 
 Special characters defined as sequence of 2 bytes (/b1/ and /b2/).
 
@@ -57,7 +62,7 @@ Validation driven by set of rules listed below. Valid file must fit all rules.
 Valid Daf-file starts with =0x44=, =0x41=, =0x46= bytes.
 
 ** R02. File has 3 sections
-Valid Daf-file has only 3 =section_separators=.
+Valid daf-file have 2 =section_separator= at the beginning. All =section_separator= bytes in the /content/ section is ignored (case of byte coincidence and nested archives).
 
 ** R03. File has =content= row in /toc/
 Valid Daf-file has /toc/ section which last row is a content row. /File name/ of this row equals =content=.
