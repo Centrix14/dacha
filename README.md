@@ -6,3 +6,4 @@ It's 1st January here. Light wind of miracle still in the air. Even thoughts —
 # Table of contents
 - `dar` (dacha archiver) - file archiver with own format (stage: concept)
 - `ded64` (dacha encoder/decoder for Base64) - library and utility for Base64 encoding/decoding (stage: library - done, util - not even started)
+- `dws` (dacha web-server) - small web-server (stage: WIP)
