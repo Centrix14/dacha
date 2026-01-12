@@ -2,10 +2,75 @@
 #+author: Centrix14
 #+date: <2026-01-01 Чт>
 
-* Goal
-Dacha Archiver (=dar=) is a small toy archiver made as etude in Zig programming and archive technology. Its format (=daf=) has the same nature.
+* Aim
+Dacha Archiver (=dar=) is a archiver made as etude in Zig programming and archive technology. It uses its own archive format — =daf=.
 
+=Dar= is not another dumb-pet-project. My aim is not just to recreate existing concepts on my own. In order to recreate something i trying to inspect existing approaches, their pros and cons and suggest something simple but yet useful. It's more like a proof-of-concept than just a pet project.
+
+* Archiving formats rapid overview
+There are a few archive formats: ar, cpio, tar, lbr (CP/M one). Most of the other formats are «dirty»: they intended to archive and compress, while i interested in archiving only.
+
+I used only this formats as references for =dar=:
+- ar,
+- cpio,
+- tar,
+- lbr.
+
+** Two types of archives: indexes and bundles
+Formats listed above can be separated into two controversial groups.
+
+The first group is /indexes/ as i call them by myself. Indexes use some sort of table of contents. Because of that they usually don't need any special bytes to separate content. This type of format makes sense only for random access storages.
+
+The second group is /bundles/. In contrast to indexes, bundles don't have any table of contents — they put all metadata in a header that prepends each archive member. This type is very old and adapted for magnetic tapes and other sequential storage.
+
+** Bundles
+*** ar
+=ar= utility has no standartized format, but we have good [[https://en.wikipedia.org/wiki/Ar_(Unix)][description]] of those in Wikipedia.
+
+=ar= is a very simple bundle-type archiver widely used for binary archives creation i. e. libraries, shared objects and so on. It creates index (armap, directory) of symbols which is similiar to table of contents but describes /symbols/ (functions, procedures), not /files/.
+
+=ar= commonly used for binary archive creation, but it ASCII-clear. For example:
+#+begin_src shell :results output :wrap example
+  echo "File 1" > f1
+  echo "File 2" > f2
+  ar rc arch f1 f2
+  cat arch
+#+end_src
+
+#+RESULTS:
+#+begin_example
+!<arch>
+f1/             0           0     0     644     7         `
+File 1
+
+f2/             0           0     0     644     7         `
+File 2
+
+#+end_example
+
+*** cpio
+=cpio= was standardized in POSIX (1988) but in 2001 was removed. =cpio= had file size limitations (described in [[https://en.wikipedia.org/wiki/Cpio#POSIX_standardization][Wikipedia]]).
+
+=cpio= is younger than =ar=, but older than =tar=. This format has detailed description [[https://manpages.ubuntu.com/manpages/resolute/man5/cpio.5.html][here]]. Most notable characteristic of this format is a ASCII-clearance (all metadata is represented as plain text). In other details it's a typical thing.
+
+But command line interface of =cpio= is a subject of interest. =cpio= is a piped utility: it accepts STDIN and fills STDOUT. Main commands (flags) is quite orthogonal and derived from this general idea: o (output, create) — assembles archive and prints in to output; i (input, extract) — disassembles archive from input; p (pass-through) — copy input to output.
+
+*** tar
+=tar= has several standards, most notable is UStar and pax. Friendly introduction to =tar= format posted [[https://depot.dev/blog/what-is-a-tar-file][here]]. There is also description in [[https://en.wikipedia.org/wiki/Tar_(computing)][Wikipedia]].
+
+=tar= is very old. It's younger than =ar= but feels like a weapon of sorcerers. It's suited for magnetic tapes and therefore reads archives by entries which is sequence of blocks (usually, 20 blocks).
+
+=tar= is not ASCII-clear and with default setting not so efficent. It was good on tapes but not very optimized for modern technologies. But the good idea in =tar= is a /blocks/. Blocking IO is fast and (for Unix) native feature.
+
+** Indexes
+*** lbr
 * General structure
+** =Daf= as dual-layer format
+Formats mentioned above are trying to suggest one solid solution for two different tasks: (1) assembling and disassembling /sized sequences of bytes/ (not even files), (2) storing and applying metadata (names, paths, ownership, rights, etc.).
+
+(And here i was interrupted by the rush of modern life. Continue coming soon.)
+
+** Old description (need to be revised)
 Daf-file has divided into sections. File must have 3 (and only 3) sections: /header/, /toc/ and /content/. Sections have arbitrary size. Sections separated by =section_seperator=.
 
 General structure of archive is follows:
@@ -16,7 +81,6 @@ General structure of archive is follows:
 | Content |
 |---------|
 | EOF     |
-
 
 ** Sections in general
 /Header/ section contains information about file. It consists of 3 bytes: =0x44=, =0x41=, =0x46= (=DAF= letters).
@@ -69,3 +133,6 @@ Valid Daf-file has /toc/ section which last row is a content row. /File name/ of
 
 ** R04. Content row has valid size
 /File size/ column in content row of the valid daf-file is a sum of file sizes in other rows or 0.
+
+** R05. /Toc/ rows are unique
+/File names/ should be unique.
