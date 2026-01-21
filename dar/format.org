@@ -60,15 +60,24 @@ But command line interface of =cpio= is a subject of interest. =cpio= is a piped
 
 =tar= is very old. It's younger than =ar= but feels like a weapon of sorcerers. It's suited for magnetic tapes and therefore reads archives by entries which is sequence of blocks (usually, 20 blocks).
 
-=tar= is not ASCII-clear and with default setting not so efficent. It was good on tapes but not very optimized for modern technologies. But the good idea in =tar= is a /blocks/. Blocking IO is fast and (for Unix) native feature.
+=tar= is not ASCII-clear and with default setting not so efficent. It was good on tapes but not very optimized for modern technologies. But the good idea in =tar= is a /blocks/. Blocking IO is fast and (for Linux) native feature.
 
 ** Indexes
 *** lbr
 * General structure
 ** =Daf= as dual-layer format
-Formats mentioned above are trying to suggest one solid solution for two different tasks: (1) assembling and disassembling /sized sequences of bytes/ (not even files), (2) storing and applying metadata (names, paths, ownership, rights, etc.).
+Formats mentioned above are trying to suggest one unite solution for two different tasks: (1) assembling and disassembling /ranges of bytes/ (not even files), (2) storing and applying metadata (names, paths, ownership, rights, etc.).
 
-(And here i was interrupted by the rush of modern life. Continue coming soon.)
+For most of the cases these tasks are inseparable: you usually assemble and disassemble real files living in a file and security system. But in essence they can be separated. And that is what =daf= does.
+
+=Daf= includes two formats (layers):
+- =laf= (low-level archiving format),
+- =haf= (high-level archiving format).
+
+=Laf= intended to solve first task: assemble and disassemble ranges of bytes, while =haf= handles metadata, directory structure and so on. =Laf= can be used separatly from =haf= and vice versa.
+
+*** Low-level archiving format (laf)
+*** High-level archiving format (haf)
 
 ** Old description (need to be revised)
 Daf-file has divided into sections. File must have 3 (and only 3) sections: /header/, /toc/ and /content/. Sections have arbitrary size. Sections separated by =section_seperator=.
