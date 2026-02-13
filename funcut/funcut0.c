@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/mman.h>
 
 typedef unsigned int uint;
 typedef unsigned char byte;
@@ -11,7 +12,7 @@ byte global_buffer[2048];
 #endif
 
 byte *init_buffer(size_t size);
-void deinit_buffer(byte *buffer);
+void deinit_buffer(byte *buffer, size_t size);
 
 void print_hex(byte *buffer, uint length);
 
@@ -97,7 +98,7 @@ int main(int argc, char *argv[]) {
     uint (*func)(uint,uint) = (uint (*)(uint,uint))buffer;
     func(2, 5);
 
-    deinit_buffer(buffer);
+    deinit_buffer(buffer, sizeof(byte) * length);
     fclose(source);
     
     return 0;
@@ -105,16 +106,22 @@ int main(int argc, char *argv[]) {
 
 byte *init_buffer(size_t size) {
     #ifdef BUFFER_DYNAMIC
-    return (byte*)malloc(size);
+    void *result = mmap(NULL, size,
+                        PROT_READ | PROT_WRITE | PROT_EXEC,
+                        MAP_PRIVATE | MAP_ANON,
+                        -1, 0);
+    if (result == MAP_FAILED)
+        return NULL;
+    return result;
     #else
     memset(&global_buffer, 0, 2048);
     return &global_buffer;
     #endif
 }
 
-void deinit_buffer(byte *buffer) {
+void deinit_buffer(byte *buffer, size_t size) {
     #ifdef BUFFER_DYNAMIC
-    free(buffer);
+    munmap(buffer, size);
     #endif
 }
 
