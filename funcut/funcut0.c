@@ -85,6 +85,9 @@ int main(int argc, char *argv[]) {
     printf("Ok\n");
     print_hex(buffer, length);
 
+    uint (*func)(uint,uint) = (uint (*)(uint,uint))buffer;
+    func(2, 5);
+
     free(buffer);
     fclose(source);
     
