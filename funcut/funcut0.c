@@ -53,7 +53,7 @@ int main(int argc, char *argv[]) {
 
     int seek_fail = fseek(source, start, SEEK_SET);
     if (seek_fail) {
-        fprintf(stderr, "Error: unable to find position 0x%x (%d) in a file %s\n",
+        fprintf(stderr, "Error: unable to find position %x (%d) in a file %s\n",
                 start, start, argv[1]);
         return 5;
     }
@@ -62,21 +62,21 @@ int main(int argc, char *argv[]) {
 
     byte *buffer = (byte*)malloc(sizeof(byte) * length);
     if (!buffer) {
-        fprintf(stderr, "Error: unable to allocate 0x%x bytes\n", length);
+        fprintf(stderr, "Error: unable to allocate %x bytes\n", length);
         return 6;
     }
 
-    printf("Read 0x%x bytes from 0x%x to 0x%x\n", length, start, end);
+    printf("Read %x bytes from %x to %x\n", length, start, end);
     size_t readed = fread(buffer, sizeof(byte), length, source);
     if (readed != (size_t)length) {
         if (feof(source)) {
-            fprintf(stderr, "Error: EOF reached before end (0x%x)\n", end);
+            fprintf(stderr, "Error: EOF reached before end (%x)\n", end);
             return 7;
         }
 
         int error = ferror(source);
         if (error) {
-            fprintf(stderr, "Error: error 0x%x occured\n", error);
+            fprintf(stderr, "Error: error %x occured\n", error);
         }
     }
 
