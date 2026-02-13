@@ -18,19 +18,35 @@ int main(int argc, char *argv[]) {
 
     uint offset = 0;
     if (argc == 5) {
-        offset = (uint)atoi(argv[4]);
+        int readed = sscanf(argv[4], "%x", &offset);
 
-        if (!offset)
-            fprintf(stderr, "Warning: offset = 0, assume it`s right\n");
+        if (readed != 1) {
+            fprintf(stderr, "Error: unable to read offset. Perhaps you accidentally added 0x prefix?\n");
+            return 3;
+        }
     }
 
-    uint start = (uint)atoi(argv[2]) + offset;
-    uint end = (uint)atoi(argv[3]) + offset;
+    uint start = 0;
+    int start_readed = sscanf(argv[2], "%x", &start);
+    if (start_readed != 1) {
+        fprintf(stderr, "Error: unable to read start position. Perhaps you accidentally added 0x prefix?\n");
+        return 4;
+    }
+
+    uint end = 0;
+    int end_readed = sscanf(argv[3], "%x", &end);
+    if (end_readed != 1) {
+        fprintf(stderr, "Error: unable to read end position. Perhaps you accidentally added 0x prefix?\n");
+        return 5;
+    }
 
     if (start > end) {
         fprintf(stderr, "Error: invalid positions. Perhaps you confused start and end?\n");
-        return 4;
+        return 6;
     }
+
+    start += offset;
+    end += offset;
 
     if (!start)
         fprintf(stderr, "Warning: start = 0, assume it`s right\n");
