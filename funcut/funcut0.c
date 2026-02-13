@@ -87,11 +87,12 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    printf("Ok\n");
+    printf("Ok\n\n");
     print_hex(buffer, length);
 
     uint (*func)(uint,uint) = (uint (*)(uint,uint))buffer;
-    func(2, 5);
+    uint result = func(2, 5);
+    printf("\n> %x\n", result);
 
     deinit_buffer(buffer, sizeof(byte) * length);
     fclose(source);
