@@ -5,8 +5,8 @@ typedef unsigned int uint;
 typedef unsigned char byte;
 
 int main(int argc, char *argv[]) {
-    if (argc != 4) {
-        fprintf(stderr, "usage: fc0 object-file start end\n");
+    if (argc < 4 || argc > 5) {
+        fprintf(stderr, "usage: fc0 object-file start end [offset]\n");
         return 1;
     }
 
