@@ -6,11 +6,6 @@
 typedef unsigned int uint;
 typedef unsigned char byte;
 
-#define BUFFER_DYNAMIC
-#ifndef BUFFER_DYNAMIC
-byte global_buffer[2048];
-#endif
-
 byte *init_buffer(size_t size);
 void deinit_buffer(byte *buffer, size_t size);
 
@@ -105,7 +100,6 @@ int main(int argc, char *argv[]) {
 }
 
 byte *init_buffer(size_t size) {
-    #ifdef BUFFER_DYNAMIC
     void *result = mmap(NULL, size,
                         PROT_READ | PROT_WRITE | PROT_EXEC,
                         MAP_PRIVATE | MAP_ANON,
@@ -113,16 +107,10 @@ byte *init_buffer(size_t size) {
     if (result == MAP_FAILED)
         return NULL;
     return result;
-    #else
-    memset(&global_buffer, 0, 2048);
-    return &global_buffer;
-    #endif
 }
 
 void deinit_buffer(byte *buffer, size_t size) {
-    #ifdef BUFFER_DYNAMIC
     munmap(buffer, size);
-    #endif
 }
 
 void print_hex(byte *buffer, uint length) {
