@@ -4,6 +4,8 @@
 typedef unsigned int uint;
 typedef unsigned char byte;
 
+void print_hex(byte *buffer, uint length);
+
 int main(int argc, char *argv[]) {
     if (argc < 4 || argc > 5) {
         fprintf(stderr, "usage: fc0 object-file start end [offset]\n");
@@ -81,9 +83,20 @@ int main(int argc, char *argv[]) {
     }
 
     printf("Ok\n");
+    print_hex(buffer, length);
 
     free(buffer);
     fclose(source);
     
     return 0;
+}
+
+void print_hex(byte *buffer, uint length) {
+    for (uint i = 0; i < length; i++) {
+        printf("%x ", buffer[i]);
+
+        if ((i+1) % 8 == 0)
+            fputc('\n', stdout);
+    }
+    fputc('\n', stdout);
 }
