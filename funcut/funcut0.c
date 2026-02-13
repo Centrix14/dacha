@@ -18,7 +18,7 @@ int main(int argc, char *argv[]) {
 
     uint offset = 0;
     if (argc == 5) {
-        offset = (unit)atoi(argv[4]);
+        offset = (uint)atoi(argv[4]);
 
         if (!offset)
             fprintf(stderr, "Warning: offset = 0, assume it`s right\n");
