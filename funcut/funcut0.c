@@ -1,8 +1,17 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 typedef unsigned int uint;
 typedef unsigned char byte;
+
+#define BUFFER_DYNAMIC
+#ifndef BUFFER_DYNAMIC
+byte global_buffer[2048];
+#endif
+
+byte *init_buffer(size_t size);
+void deinit_buffer(byte *buffer);
 
 void print_hex(byte *buffer, uint length);
 
@@ -62,7 +71,7 @@ int main(int argc, char *argv[]) {
 
     uint length = end - start;
 
-    byte *buffer = (byte*)malloc(sizeof(byte) * length);
+    byte *buffer = init_buffer(sizeof(byte) * length);
     if (!buffer) {
         fprintf(stderr, "Error: unable to allocate %x bytes\n", length);
         return 8;
@@ -88,10 +97,25 @@ int main(int argc, char *argv[]) {
     uint (*func)(uint,uint) = (uint (*)(uint,uint))buffer;
     func(2, 5);
 
-    free(buffer);
+    deinit_buffer(buffer);
     fclose(source);
     
     return 0;
+}
+
+byte *init_buffer(size_t size) {
+    #ifdef BUFFER_DYNAMIC
+    return (byte*)malloc(size);
+    #else
+    memset(&global_buffer, 0, 2048);
+    return &global_buffer;
+    #endif
+}
+
+void deinit_buffer(byte *buffer) {
+    #ifdef BUFFER_DYNAMIC
+    free(buffer);
+    #endif
 }
 
 void print_hex(byte *buffer, uint length) {
