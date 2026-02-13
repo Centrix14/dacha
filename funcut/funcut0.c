@@ -16,20 +16,20 @@ int main(int argc, char *argv[]) {
         return 2;
     }
 
-    uint start = (uint)atoi(argv[2]);
-    uint end = (uint)atoi(argv[3]);
-
-    if (start > end) {
-        fprintf(stderr, "Error: invalid positions. Perhaps you confused start and end?\n");
-        return 4;
-    }
-
     uint offset = 0;
     if (argc == 5) {
         offset = (unit)atoi(argv[4]);
 
         if (!offset)
             fprintf(stderr, "Warning: offset = 0, assume it`s right\n");
+    }
+
+    uint start = (uint)atoi(argv[2]) + offset;
+    uint end = (uint)atoi(argv[3]) + offset;
+
+    if (start > end) {
+        fprintf(stderr, "Error: invalid positions. Perhaps you confused start and end?\n");
+        return 4;
     }
 
     if (!start)
