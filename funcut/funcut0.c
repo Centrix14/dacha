@@ -24,6 +24,14 @@ int main(int argc, char *argv[]) {
         return 4;
     }
 
+    uint offset = 0;
+    if (argc == 5) {
+        offset = (unit)atoi(argv[4]);
+
+        if (!offset)
+            fprintf(stderr, "Warning: offset = 0, assume it`s right\n");
+    }
+
     if (!start)
         fprintf(stderr, "Warning: start = 0, assume it`s right\n");
 
