@@ -66,7 +66,15 @@
                                       #'from-sexp
                                       contents)))))
 
+(defgeneric take (name menu))
+
+(defmethod take ((name string) (menu menu))
+  (position name (contents-of menu)
+            :test (lambda (name dish)
+                    (equalp name (name-of dish)))))
+
 (defgeneric add (dish menu))
 
 (defmethod add ((dish dish) (menu menu))
-  (nconc (contents-of menu) (list dish)))
+  (when (null (take (name-of dish) menu))
+   (nconc (contents-of menu) (list dish))))
