@@ -6,11 +6,11 @@
     :accessor name-of)))
 
 (defclass menu ()
-  ((length
+  ((capacity
     :type integer
     :initform 0
-    :initarg :length
-    :accessor length-of)
+    :initarg :capacity
+    :accessor capacity-of)
 
    (contents
     :type list
@@ -25,7 +25,7 @@
 
 (defmethod to-sexp ((obj menu))
   (list 'menu
-        (list :length (length-of obj)
+        (list :capacity (capacity-of obj)
               :contents (map 'list
                              (lambda (elm) (to-sexp elm))
                              (contents-of obj)))))
@@ -47,3 +47,5 @@
     (if (equal :name param)
         (make-instance 'dish :name value)
         nil)))
+
+
