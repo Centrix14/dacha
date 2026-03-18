@@ -10,7 +10,13 @@
     :type integer
     :initform 0
     :initarg :length
-    :accessor length-of)))
+    :accessor length-of)
+
+   (contents
+    :type list
+    :initform '()
+    :initarg :contents
+    :accessor contents-of)))
 
 (defgeneric to-sexp (obj))
 
