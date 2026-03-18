@@ -23,6 +23,13 @@
 (defmethod to-sexp ((obj dish))
   (list 'dish (list :name (name-of obj))))
 
+(defmethod to-sexp ((obj menu))
+  (list 'menu
+        (list :length (length-of obj)
+              :contents (map 'list
+                             (lambda (elm) (to-sexp elm))
+                             (contents-of obj)))))
+
 (defun from-sexp (sexp)
   (if (> (length sexp) 1)
       (%from-sexp% sexp)
