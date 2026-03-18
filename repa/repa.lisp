@@ -40,7 +40,8 @@
         (params (second sexp)))
 
     (case type
-      (dish (%dish-from-sexp% params)))))
+      (dish (%dish-from-sexp% params))
+      (menu (%menu-from-sexp% params)))))
 
 (defun %dish-from-sexp% (params)
   (destructuring-bind (param value) params
