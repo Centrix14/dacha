@@ -48,4 +48,13 @@
         (make-instance 'dish :name value)
         nil)))
 
+(defun %menu-from-sexp% (params)
+  (destructuring-bind (capacity-param capacity contents-param contents) params
+    (if (and (equal :capacity capacity-param)
+             (equal :contents contents-param))
 
+        (make-instance 'menu
+                       :capacity capacity
+                       :contents (map 'list
+                                      #'from-sexp
+                                      contents)))))
