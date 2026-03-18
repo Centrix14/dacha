@@ -77,4 +77,15 @@
 
 (defmethod add ((dish dish) (menu menu))
   (when (null (take (name-of dish) menu))
-   (nconc (contents-of menu) (list dish))))
+    (nconc (contents-of menu) (list dish))))
+
+(defgeneric drop (name menu))
+
+(defmethod drop ((name string) (menu menu))
+  (let ((index (take name menu))
+        (contents (contents-of menu)))
+
+    (unless (null index)
+      (setf (contents-of menu)
+            (append (subseq contents 0 index)
+                    (subseq contents (1+ index)))))))
