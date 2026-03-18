@@ -10,13 +10,19 @@
     :type integer
     :initform 0
     :initarg :capacity
-    :accessor capacity-of)
+    :accessor capacity-of
+
+    :documentation
+    "Defines number of dishes that menu can include")
 
    (contents
     :type list
     :initform '()
     :initarg :contents
-    :accessor contents-of)))
+    :accessor contents-of
+
+    :documentation
+    "Defines actual menu - a list of dishes")))
 
 (defgeneric to-sexp (obj))
 
