@@ -13,7 +13,7 @@
     :accessor capacity-of
 
     :documentation
-    "Defines number of dishes that menu can include")
+    "Defines number of dishes that menu can include; -1 = infinity")
 
    (contents
     :type list
@@ -65,3 +65,8 @@
                        :contents (map 'list
                                       #'from-sexp
                                       contents)))))
+
+(defgeneric add (dish menu))
+
+(defmethod add ((dish dish) (menu menu))
+  (nconc (contents-of menu) (list dish)))
